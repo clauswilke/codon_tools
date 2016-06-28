@@ -7,6 +7,8 @@ from Bio.Alphabet import IUPAC
 reverse_genetic_code = {  'A':['GCA', 'GCC', 'GCG', 'GCT'], 'R':['AGA', 'AGG', 'CGA', 'CGT', 'CGC', 'CGG'], 'N':['AAC', 'AAT'], 'D':['GAC', 'GAT'], 'C':['TGC', 'TGT' ], 'Q':['CAA', 'CAG'], 'E':['GAA', 'GAG'], 'G':['GGA', 'GGC', 'GGG', 'GGT'], 'H':['CAC', 'CAT'], 'I':['ATA', 'ATC', 'ATT'], 'L':['CTA', 'CTC', 'CTG', 'CTT', 'TTA', 'TTG'], 'F':['TTT', 'TTC'], 'P':['CCA', 'CCC', 'CCG', 'CCT'], 'S':['AGC', 'AGT', 'TCA', 'TCC','TCG','TCT'], 'T':[ 'ACA', 'ACT', 'ACC', 'ACG' ], 'Y':['TAC', 'TAT'], 'V':['GTA', 'GTC', 'GTG', 'GTT'], 'W':['TGG'], 'M':['ATG'], 'K':['AAA', 'AAG']}
 
 class CodonOptimizer:
+    """Class to optimize codon usage in an ORF. When instantiated, it needs to be given a ``scorer`` object that implements a ``score`` function. 
+    """
     def __init__(self, scorer):
         self.scorer = scorer
 
@@ -16,9 +18,9 @@ class CodonOptimizer:
         return Seq(dna, IUPAC.unambiguous_dna)
 
     def change_random_codon(self, seq, start_window, end_window):
-        """seq: The nucleotide sequence in which a codon should be changed
-start_window: number of codons to omit at beginning of sequence
-end_window: number of codons to omit at end of sequence
+        """``seq``: The nucleotide sequence in which a codon should be changed
+``start_window``: number of codons to omit at beginning of sequence
+``end_window``: number of codons to omit at end of sequence
 """
         #print len(seq), str(seq)
         assert len( seq ) % 3 == 0
@@ -34,7 +36,8 @@ end_window: number of codons to omit at end of sequence
           self.random_reverse_translate(seq[nt_index:nt_index+3].translate()) + \
           seq[nt_index+3:]
 
-    def hillclimb(self, seq, start_window = 0, end_window = 0, rel_tolerance = .0001, max_iter = 1000, maximize = True ):
+    def hillclimb(self, seq, start_window = 0, end_window = 0, target_score = None, tolerance = .01, max_wait_count = 1000, maximize = True ):
+        '''The hillclimb will stop if the obtained score is within ``tolerance`` of ``target_score`` (if given), or if the score has not improved over the last ``max_wait_count`` trials.'''
         if maximize:
             coef = 1
         else:
@@ -43,25 +46,27 @@ end_window: number of codons to omit at end of sequence
         score = coef*self.scorer.score(seq)
     
         i = 0
-        delta = 1000000
+        wait_count = 0
         while True:
             i += 1
+            wait_count += 1 
             new_seq = self.change_random_codon(seq, start_window, end_window )
             new_score = coef*self.scorer.score(new_seq)
             if new_score > score:
-                delta = coef*(new_score - score)/score
                 score = new_score
                 seq = new_seq
-                print(i, coef*score, delta, seq)
-            if delta < rel_tolerance:
+                wait_count = 0
+                print(i, coef*score, seq)
+                if target_score:
+                    if abs(score-coef*target_score) <= tolerance:
+                        break
+            elif wait_count > max_wait_count:
                 break
-            if i > max_iter:
-                break
-        #print( "Iterations: %i" % i )
-        return ( seq, score )
+        print(i, coef*score, seq)
+        return (seq, score)
     
     
-class Scorer:
+class TestScorer:
     def score(self, seq):
         i = 0
         for c in seq:
@@ -70,12 +75,12 @@ class Scorer:
         return i
     
 def test():
-    s = Scorer()
+    s = TestScorer()
     o = CodonOptimizer(s)
 
     seq = Seq('ATGGTGAGCAAGGGCGAGGAGCTGTTCACCGGGGTGGTGCCCATCCTGGTCGAGCTGGACGGCGACGTAAACGGCCACAAGTTCAGCGTGTCCGGCGAGGGCGAGGGCGATGCCACCTACGGCAAGCTGACCCTGAAGTTCATCTGCACCACCGGCAAGCTGCCCGTGCCCTGGCCCACCCTCGTGACCACCCTGACCTACGGCGTGCAGTGCTTCAGCCGCTACCCCGACCACATGAAGCAGCACGACTTCTTCAAGTCCGCCATGCCCGAAGGCTACGTCCAGGAGCGCACCATCTTCTTCAAGGACGACGGCAACTACAAGACCCGCGCCGAGGTGAAGTTCGAGGGCGACACCCTGGTGAACCGCATCGAGCTGAAGGGCATCGACTTCAAGGAGGACGGCAACATCCTGGGGCACAAGCTGGAGTACAACTACAACAGCCACAACGTCTATATCATGGCCGACAAGCAGAAGAACGGCATCAAGGTGAACTTCAAGATCCGCCACAACATCGAGGACGGCAGCGTGCAGCTCGCCGACCACTACCAGCAGAACACCCCCATCGGCGACGGCCCCGTGCTGCTGCCCGACAACCACTACCTGAGCACCCAGTCCGCCCTGAGCAAAGACCCCAACGAGAAGCGCGATCACATGGTCCTGCTGGAGTTCGTGACCGCCGCCGGGATCACTCTCGGCATGGACGAGCTGTACAAG', IUPAC.unambiguous_dna)
 
-    o.hillclimb(seq, maximize=False)
+    o.hillclimb(seq, target_score=168, maximize=False)
         
 # when run as its own script, 
 if __name__ == "__main__":
