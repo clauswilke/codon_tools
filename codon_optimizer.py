@@ -36,8 +36,14 @@ class CodonOptimizer:
           self.random_reverse_translate(seq[nt_index:nt_index+3].translate()) + \
           seq[nt_index+3:]
 
-    def hillclimb(self, seq, start_window = 0, end_window = 0, target_score = None, tolerance = .01, max_wait_count = 1000, maximize = True ):
-        '''The hillclimb will stop if the obtained score is within ``tolerance`` of ``target_score`` (if given), or if the score has not improved over the last ``max_wait_count`` trials.'''
+    def hillclimb(self, seq, start_window = 0, end_window = 0, target_score = None, tolerance = .01, max_wait_count = 1000, maximize = True, verbosity = 1 ):
+        '''The hillclimb will stop if the obtained score is within ``tolerance`` of ``target_score`` (if given), or if the score has not improved over the last ``max_wait_count`` trials.
+        
+Verbosity levels:
+    0: print nothing
+    1: print only when next sequence is found
+    2: print every step
+'''
         if maximize:
             coef = 1
         else:
@@ -52,11 +58,14 @@ class CodonOptimizer:
             wait_count += 1 
             new_seq = self.change_random_codon(seq, start_window, end_window )
             new_score = coef*self.scorer.score(new_seq)
+            if verbosity > 1:
+                print(i, coef*score, coef*new_score)
             if new_score > score:
                 score = new_score
                 seq = new_seq
                 wait_count = 0
-                print(i, coef*score, seq)
+                if verbosity > 0:
+                    print(i, coef*score, seq)
                 if target_score:
                     if abs(score-coef*target_score) <= tolerance:
                         break
