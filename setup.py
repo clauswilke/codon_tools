@@ -9,5 +9,6 @@ setup(name='codon_manipulator',
       license='MIT',
       package_dir = {'codon_manipulator':'src'},
       install_requires=['Biopython'],
-      packages=['codon_manipulator']
+      packages=['codon_manipulator'],
+      zip_safe=False
       )

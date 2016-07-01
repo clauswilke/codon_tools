@@ -1,4 +1,5 @@
-from codon_analyzer import CodonAnalyzer
+#! /usr/bin/env python3
+from .codon_analyzer import *
 
 class SequenceAnalyzer:
     def __init__(self):
@@ -40,5 +41,5 @@ def test():
 
     
 # when run as its own script, 
-if __name__ == "__main__":
-    test()
+#if __name__ == "__main__":
+#    test()

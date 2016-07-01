@@ -1,4 +1,2 @@
 __version__ = '0.1'
-from .codon_analyzer.py	import *
-from .sequence_analyzer.py import *
-from .sequence_analyzer.py import *
+__all__ = ["codon_analyzer", "codon_optimizer", "sequence_analyzer"]
