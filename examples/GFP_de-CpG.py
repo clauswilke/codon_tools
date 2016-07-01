@@ -1,27 +1,11 @@
 #!/usr/bin/env python3
-from codon_tools import SequenceAnalyzer, CodonOptimizer
+from codon_tools import SequenceAnalyzer, CodonOptimizer, StopAndCpGScorer
 
 from Bio import SeqIO
 from Bio.Seq import Seq
 from Bio.Alphabet import IUPAC
 
-class StopAndCpGScorer:
-    def __init__(self, m2stop_coef, CpG_coef, UpA_coef):
-        self.sa = SequenceAnalyzer()
-        self.m2stop_coef = m2stop_coef
-        self.CpG_coef = CpG_coef
-        self.UpA_coef = UpA_coef
 
-    def calc_score_components(self, seq):
-        m2stop_count = self.sa.count_muts_to_stop(seq)
-        CpG_count, UpA_count = self.sa.count_CpG(seq)
-        return m2stop_count, CpG_count, UpA_count
-
-    def score(self, seq):
-        m2stop_count, CpG_count, UpA_count = self.calc_score_components(seq)
-        return self.m2stop_coef*m2stop_count + self.CpG_coef*CpG_count + self.UpA_coef*UpA_count
-    
-        
 def de_CpG(seq):
     """Remove as many CpGs as possible, as well as potential single-point mutations to stop and UpAs.
 """
@@ -29,7 +13,7 @@ def de_CpG(seq):
     o = CodonOptimizer(scorer)
 
     seq_orig = seq
-    seq, score = o.hillclimb(seq, maximize=False, max_wait_count = 5000, verbosity=0)
+    seq, score = o.hillclimb(seq, maximize=False, max_wait_count = 5000, verbosity = 0)
     assert seq_orig.translate() == seq.translate()
     
     m2stop_count, CpG_count, UpA_count = scorer.calc_score_components(seq_orig)
