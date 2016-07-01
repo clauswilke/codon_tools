@@ -1,6 +1,7 @@
 from Bio.Seq import Seq
 from Bio.Alphabet import generic_dna
 
+
 class CodonAnalyzer:
     def __init__(self):
         self.stop_counts = {} # initialize stop_counts dict as empty, it will be filled as needed
