@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 import time       
 
-from codon_manipulator import CodonAnalyzer
+from codon_tools import CodonAnalyzer
 
 def test_stop_count():
     a = CodonAnalyzer()

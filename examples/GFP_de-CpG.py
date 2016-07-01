@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from codon_manipulator import SequenceAnalyzer, CodonOptimizer
+from codon_tools import SequenceAnalyzer, CodonOptimizer
 
 from Bio import SeqIO
 from Bio.Seq import Seq

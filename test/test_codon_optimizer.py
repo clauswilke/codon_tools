@@ -4,7 +4,7 @@ import random
 from Bio.Seq import Seq
 from Bio.Alphabet import IUPAC
 
-from codon_manipulator import CodonOptimizer
+from codon_tools import CodonOptimizer
     
 class TestScorer:
     def score(self, seq):

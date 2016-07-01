@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from codon_manipulator import SequenceAnalyzer
+from codon_tools import SequenceAnalyzer
 
 def test():
     from Bio.Seq import Seq

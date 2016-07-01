@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-from codon_manipulator import CodonAnalyzer, reverse_genetic_code
+from codon_tools import CodonAnalyzer, reverse_genetic_code
 
 from Bio import SeqIO
 from Bio.Seq import Seq
