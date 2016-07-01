@@ -1,4 +1,3 @@
-#!/Users/wilke/anaconda/bin/python3
 from Bio.Seq import Seq
 from Bio.Alphabet import generic_dna
 

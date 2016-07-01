@@ -1,4 +1,3 @@
-#!/Users/wilke/anaconda/bin/python3
 import random
 
 from Bio.Seq import Seq

@@ -1,4 +1,3 @@
-#!/Users/wilke/anaconda/bin/python3
 from codon_analyzer import CodonAnalyzer
 
 class SequenceAnalyzer:
