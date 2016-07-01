@@ -71,5 +71,5 @@ Verbosity levels:
             elif wait_count > max_wait_count:
                 break
 #        print(i, coef*score, seq)
-        return (seq, score)
+        return (seq, coef*score)
     

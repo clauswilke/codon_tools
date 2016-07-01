@@ -31,6 +31,6 @@ def de_CpG(seq):
 # when run as its own script, 
 if __name__ == "__main__":
     # read in GFP wt sequence    
-    seq = SeqIO.parse(open("GFP_wt.fasta", "rU"), "fasta").__next__().seq
+    seq = SeqIO.parse(open("fasta/GFP_wt.fasta", "rU"), "fasta").__next__().seq
     # run analysis    
     de_CpG(seq)
