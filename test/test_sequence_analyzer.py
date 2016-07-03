@@ -21,6 +21,11 @@ def test():
     print("Fraction of optimal codons:", Fop)
     print("(%i optimal sites, %i counted sites)" % (opt_count, total_count))
 
+    print()    
+    sa.calc_syn_codon_freqs(seq, verbosity = 2)
+    
+
+
 
 # when run as its own script, 
 if __name__ == "__main__":

@@ -128,5 +128,7 @@ Note: The code expects Ts not Us in the sequence.
                 counts[c] = fam_counts[c]/total
         
         if verbosity > 0:
-            print('--Relative frequencies--')
+            if verbosity > 1:
+                print('--Relative frequencies--')
             self.print_codon_freqs(counts)
+        return counts
