@@ -1,62 +1,7 @@
 #!/usr/bin/env python3
-from codon_tools import SequenceAnalyzer, CodonOptimizer, StopAndCpGScorer
+from codon_tools import SequenceAnalyzer, CodonOptimizer, CodonFreqScorer, StopAndCpGScorer
 
 from Bio import SeqIO
-
-class CodonFreqScorer:
-    """Scores sequences based on how close codon frequencies are to target frequencies.
-"""
-    def __init__(self):
-        self.have_codon_freqs = False
-        self.sa = SequenceAnalyzer()
-
-    def set_codon_freqs_from_seq(self, seq):
-        """Sets target codon frequencies calculated from the given sequence.
-"""
-        self.codon_freqs = self.sa.calc_syn_codon_freqs(seq)
-        self.have_codon_freqs = True 
-        
-    def calc_SS_to_target(self, codon_freqs):
-        """Calculates the sum of the square deviations between the provided codon frequencies and the target frequencies. Returns 0 if target frequencies have not been set.
-"""
-        if not self.have_codon_freqs:
-            return 0
-        
-        sum_square = 0
-        for codon in codon_freqs:
-            sum_square += (self.codon_freqs[codon] - codon_freqs[codon])**2
-        return sum_square
-
-    def score(self, seq):
-        codon_freqs = self.sa.calc_syn_codon_freqs(seq)
-        return(self.calc_SS_to_target(codon_freqs))
-
-
-class MultiScorer(CodonFreqScorer):
-    def __init__(self, SS_coef, m2stop_coef, CpG_coef, UpA_coef):
-        super().__init__()
-        self.SS_coef = SS_coef
-        self.m2stop_coef = m2stop_coef
-        self.CpG_coef = CpG_coef
-        self.UpA_coef = UpA_coef
-
-    def calc_score_components(self, seq):
-        codon_freqs = self.sa.calc_syn_codon_freqs(seq)
-        SS = self.calc_SS_to_target(codon_freqs)
-        m2stop_count = self.sa.count_muts_to_stop(seq)
-        CpG_count, UpA_count = self.sa.count_CpG(seq)
-        return SS, m2stop_count, CpG_count, UpA_count
-
-    def score(self, seq):
-        SS, m2stop_count, CpG_count, UpA_count = self.calc_score_components(seq)
-        return self.SS_coef*SS + self.m2stop_coef*m2stop_count + self.CpG_coef*CpG_count + self.UpA_coef*UpA_count
-
-
-def test(seq, target_seq):
-    scorer = CodonFreqScorer()
-    scorer.set_codon_freqs_from_seq(target_seq)
-    print(scorer.score(seq))
-
 
 def optimize_codon_freqs(seq, target_seq):
     scorer = CodonFreqScorer()
@@ -87,36 +32,6 @@ def optimize_codon_freqs(seq, target_seq):
     m2stop_count, CpG_count, UpA_count = scorer2.calc_score_components(seq)
     print("Mutations to stop: %i, CpG count: %i, UpA count: %i" % (m2stop_count, CpG_count, UpA_count))
 
-
-
-def optimize_multi(seq, target_seq):
-    scorer = MultiScorer(1, .1, .1, .05)
-    scorer.set_codon_freqs_from_seq(target_seq)
-    o = CodonOptimizer(scorer)
-    sa = SequenceAnalyzer()
-
-    seq_orig = seq
-    seq, score = o.hillclimb(seq, maximize=False, max_wait_count = 500, verbosity = 1)
-    assert seq_orig.translate() == seq.translate()
-    
-    print("Original sequence")
-    print("=================")
-    sa.calc_syn_codon_freqs(seq_orig, verbosity = 1)
-
-    print("\nTarget sequence")
-    print("=================")
-    sa.calc_syn_codon_freqs(target_seq, verbosity = 1)
-
-    print("\nOptimized sequence:")
-    print("=================")
-    sa.calc_syn_codon_freqs(seq, verbosity = 1)
-    
-    print()
-    print(seq)
-    
-    SS, m2stop_count, CpG_count, UpA_count = scorer.calc_score_components(seq)
-    print("Mutations to stop: %i, CpG count: %i, UpA count: %i" % (m2stop_count, CpG_count, UpA_count))
-
  
         
 # when run as its own script, 
@@ -128,6 +43,4 @@ if __name__ == "__main__":
     seq = SeqIO.parse(open("fasta/GFP_wt.fasta", "rU"), "fasta").__next__().seq
 
     # do the job  
-    #test(seq, target_seq)
-    #optimize_codon_freqs(seq, target_seq)
-    optimize_multi(seq, target_seq)
+    optimize_codon_freqs(seq, target_seq)
