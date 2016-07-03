@@ -6,75 +6,6 @@ from Bio.SeqRecord import SeqRecord
 from codon_tools import *
 
 
-class MultiScorer(CodonFreqScorer):
-    def __init__(self, SS_coef, m2stop_coef, CpG_coef, UpA_coef):
-        super().__init__()
-        self.SS_coef = SS_coef
-        self.m2stop_coef = m2stop_coef
-        self.CpG_coef = CpG_coef
-        self.UpA_coef = UpA_coef
-        self.have_target_m2stop = False
-        self.have_target_CpG = False
-        self.have_target_UpA = False
-        self.m2stop_count = 0
-        self.CpG_count = 0
-        self.UpA_count = 0
-        
-    def set_score_targets(self, m2stop_count = None, CpG_count = None, UpA_count = None):
-        if m2stop_count is None:
-            self.have_target_m2stop = False
-        else:
-            self.have_target_m2stop = True
-            self.m2stop_count = m2stop_count
-        
-        if CpG_count is None:
-            self.have_target_CpG = False
-        else:
-            self.have_target_CpG = True
-            self.CpG_count = CpG_count
-        
-        if UpA_count is None:
-            self.have_target_UpA = False
-        else:
-            self.have_target_UpA = True
-            self.UpA_count = UpA_count
-           
-    def set_score_coefs(self, SS_coef = None, m2stop_coef = None,
-                              CpG_coef = None, UpA_coef = None):
-        if SS_coef is not None:
-            self.SS_coef = SS_coef
-        if m2stop_coef is not None:
-            self.m2stop_coef = m2stop_coef
-        if CpG_coef is not None:
-            self.CpG_coef = CpG_coef
-        if UpA_coef is not None:
-            self.UpA_coef = UpA_coef
-
-
-    def calc_score_components(self, seq):
-        codon_freqs = self.sa.calc_syn_codon_freqs(seq)
-        codon_SS = self.calc_SS_to_target(codon_freqs)
-        m2stop_count = self.sa.count_muts_to_stop(seq)
-        CpG_count, UpA_count = self.sa.count_CpG(seq)
-        return codon_SS, m2stop_count, CpG_count, UpA_count
-
-    def score(self, seq):
-        codon_SS, m2stop_count, CpG_count, UpA_count = self.calc_score_components(seq)
-        if self.have_target_m2stop:
-            m2stop_score = (self.m2stop_count - m2stop_count)**2
-        else:
-            m2stop_score = m2stop_count
-        if self.have_target_CpG:
-            CpG_score = (self.CpG_count - CpG_count)**2
-        else:
-            CpG_score = CpG_count
-        if self.have_target_UpA:
-            UpA_score = (self.UpA_count - UpA_count)**2
-        else:
-            UpA_score = UpA_count
-        return self.SS_coef*codon_SS + self.m2stop_coef*m2stop_score + self.CpG_coef*CpG_score + self.UpA_coef*UpA_score
-
-
 
 def match_codon_freqs(seq, target_seq, id, description, max_wait_count):
     scorer = CodonFreqScorer()
@@ -122,6 +53,7 @@ def match_all_freqs(seq, target_seq, id, description, max_wait_count):
     seq, score = o.hillclimb(seq, maximize=False, max_wait_count = max_wait_count, verbosity = 0)
     assert seq_orig.translate() == seq.translate()
     return SeqRecord(seq, id = id, description = description)    
+
 
 def match_codon_freqs_minimize_CpG(seq, target_seq, id, description, max_wait_count):
     scorer = MultiScorer(1, 0, 1, 0)
