@@ -20,6 +20,17 @@ class SA(SequenceAnalyzer):
                     self.zero_codon_counts[codon] = 0
 
 
+    def print_codon_freqs(self, codon_freqs, ndigits = 3):
+        for aa in reverse_genetic_code:
+            if aa == '*': # we skip over stop codons
+                continue
+            print(aa + ": ", end='')
+            codons = reverse_genetic_code[aa]
+            fam_freqs = {c:codon_freqs[c] for c in codons}
+            for codon in fam_freqs:
+                print(codon + ":", round(fam_freqs[codon], 3), end='; ')
+            print()
+
 
     def count_codons(self, seq):
         """Counts how many times each codon appears in a sequence, and returns a dictionary with codon counts.
@@ -34,11 +45,15 @@ class SA(SequenceAnalyzer):
             # we ignore any codons that we cannot uniquely identify
         return counts
 
-    def calc_syn_codon_freqs(self, seq):
+    def calc_syn_codon_freqs(self, seq, verbosity = 0):
         """Calculates the relative frequencies of different codons in the same codon family. Stop codons are ignored. Returns a dictionary with relative frequencies, normalized such that they sum to one within each amino-acid family (i.e., the total sum over all families is one).
 """
         counts = self.count_codons(seq) # get absolute codon counts
-        print(counts)
+        if verbosity > 1:
+            print('--Absolute counts--')
+            self.print_codon_freqs(counts)
+
+        
         # normalize by amino-acid family
         for aa in reverse_genetic_code:
             if aa == '*': # we skip over stop codons
@@ -48,48 +63,27 @@ class SA(SequenceAnalyzer):
             total = sum(fam_counts.values())
             for c in fam_counts:
                 counts[c] = fam_counts[c]/total
-        print(counts)
-        print(sum(counts.values()))
-        for aa in reverse_genetic_code:
-            if aa == '*': # we skip over stop codons
-                continue
-            print(aa)
-            codons = reverse_genetic_code[aa]
-            fam_counts = {c:counts[c] for c in codons}
-            print(fam_counts)
-            print()
+        
+        if verbosity > 0:
+            print('--Relative frequencies--')
+            self.print_codon_freqs(counts)
 
 
 def test(seq):
     sa = SA()
-    sa.calc_syn_codon_freqs(seq)
+    sa.calc_syn_codon_freqs(seq, verbosity = 2)
     
-
-def de_CpG(seq):
-    """Remove as many CpGs as possible, as well as potential single-point mutations to stop and UpAs.
-"""
-    scorer = StopAndCpGScorer(1, 1, 1)
-    o = CodonOptimizer(scorer)
-
-    seq_orig = seq
-    seq, score = o.hillclimb(seq, maximize=False, max_wait_count = 5000, verbosity = 0)
-    assert seq_orig.translate() == seq.translate()
-    
-    m2stop_count, CpG_count, UpA_count = scorer.calc_score_components(seq_orig)
-    print("Original sequence")
-    print("=================")
-    print("Mutations to stop: %i, CpG count: %i, UpA count: %i" % (m2stop_count, CpG_count, UpA_count))
-
-    m2stop_count, CpG_count, UpA_count = scorer.calc_score_components(seq)    
-    print("\nOptimized sequence:")
-    print("=================")
-    print("Mutations to stop: %i, CpG count: %i, UpA count: %i\n" % (m2stop_count, CpG_count, UpA_count))
-    print(seq)
     
         
 # when run as its own script, 
 if __name__ == "__main__":
-    # read in GFP wt sequence    
+    # read in the sequence    
+    seq = SeqIO.parse(open("fasta/Mahoney_ORF.fasta", "rU"), "fasta").__next__().seq
+    # run analysis    
+    test(seq)
+    print()
+    
+    # read in the sequence    
     seq = SeqIO.parse(open("fasta/GFP_wt.fasta", "rU"), "fasta").__next__().seq
     # run analysis    
     test(seq)
