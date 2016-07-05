@@ -124,8 +124,9 @@ Note: The code expects Ts not Us in the sequence.
             codons = reverse_genetic_code[aa]
             fam_counts = {c:counts[c] for c in codons}
             total = sum(fam_counts.values())
-            for c in fam_counts:
-                counts[c] = fam_counts[c]/total
+            if total > 0:
+                for c in fam_counts:
+                    counts[c] = fam_counts[c]/total
         
         if verbosity > 0:
             if verbosity > 1:
