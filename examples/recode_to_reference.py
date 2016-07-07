@@ -107,12 +107,14 @@ def generate_constructs(to_optimize, target, max_wait_count = 10000):
                   "C" + str(i),
                   "codon frequencies matched to " + target.id + " strain",
                   max_wait_count) for i in [1, 2, 3]]
+    print("completed #1-#3 of", to_optimize.id)
 
     records = records + \
                 [minimize_stop_CpG(seq,
                   "C" + str(i),
                   "minimized mutations to stop, CpG, UpA",
                   max_wait_count) for i in [4]]
+    print("completed #4 of", to_optimize.id)
 
     records = records + \
                 [match_codon_freqs_minimize_stop_CpG(seq,
@@ -120,6 +122,7 @@ def generate_constructs(to_optimize, target, max_wait_count = 10000):
                   "C" + str(i),
                   "codon frequencies matched to " + target.id + " strain and minimized mutations to stop, CpG, UpA",
                   max_wait_count) for i in [5, 6, 7]]
+    print("completed #5-#7 of", to_optimize.id)
 
     records = records + \
                 [match_all_freqs(seq,
@@ -127,6 +130,7 @@ def generate_constructs(to_optimize, target, max_wait_count = 10000):
                   "C" + str(i),
                   "codon frequencies and frequencies of mutations to stop, CpG, UpA all matched to " + target.id,
                   max_wait_count) for i in [8, 9, 10]]
+    print("completed #8-#10 of", to_optimize.id)
 
     records = records + \
                 [match_all_freqs_but_stop(seq,
@@ -134,6 +138,7 @@ def generate_constructs(to_optimize, target, max_wait_count = 10000):
                   "C" + str(i),
                   "codon frequencies and frequencies of CpG, UpA matched to " + target.id + ", minimized mutations to stop",
                   max_wait_count) for i in [11, 12, 13]]
+    print("completed #11-#13 of", to_optimize.id)
 
     records = records + \
                 [match_codon_freqs_minimize_CpG(seq,
@@ -141,6 +146,7 @@ def generate_constructs(to_optimize, target, max_wait_count = 10000):
                   "C" + str(i),
                   "codon frequencies matched to " + target.id + ", minimized CpG only",
                   max_wait_count) for i in [14, 15, 16]]
+    print("completed #14-#16 of", to_optimize.id)
 
     fasta_fname = "recoded=%s_ref=%s.fasta" % (to_optimize.id, target.id)
     descr_fname = "recoded=%s_ref=%s_descr.txt" % (to_optimize.id, target.id)
