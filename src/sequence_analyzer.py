@@ -1,4 +1,6 @@
 #! /usr/bin/env python3
+import sys
+
 from .codon_analyzer import *
 from .lookup_tables import opt_codons_E_coli, reverse_genetic_code
 
@@ -83,16 +85,17 @@ Note: The code expects Ts not Us in the sequence.
         return ( opt_count, total_count, float(opt_count)/total_count )
 
 
-    def print_codon_freqs(self, codon_freqs, ndigits = 3):
+    def print_codon_freqs(self, codon_freqs, outfile = sys.stdout, ndigits = 3):
         for aa in reverse_genetic_code:
             if aa == '*': # we skip over stop codons
                 continue
-            print(aa + ": ", end='')
+            outfile.write(aa + ": ")
             codons = reverse_genetic_code[aa]
             fam_freqs = {c:codon_freqs[c] for c in codons}
             for codon in fam_freqs:
-                print(codon + ":", round(fam_freqs[codon], 3), end='; ')
-            print()
+                outfile.write("%s: %f" % (codon, round(fam_freqs[codon], 3)))
+                outfile.write(";")
+            outfile.write("\n")
 
 
     def count_codons(self, seq):
@@ -108,13 +111,13 @@ Note: The code expects Ts not Us in the sequence.
             # we ignore any codons that we cannot uniquely identify
         return counts
 
-    def calc_syn_codon_freqs(self, seq, verbosity = 0):
+    def calc_syn_codon_freqs(self, seq, outfile = sys.stdout, verbosity = 0):
         """Calculates the relative frequencies of different codons in the same codon family. Stop codons are ignored. Returns a dictionary with relative frequencies, normalized such that they sum to one within each amino-acid family (i.e., the total sum over all families is one).
 """
         counts = self.count_codons(seq) # get absolute codon counts
         if verbosity > 1:
-            print('--Absolute counts--')
-            self.print_codon_freqs(counts)
+            outfile.write('--Absolute counts--\n')
+            self.print_codon_freqs(counts, outfile)
 
         
         # normalize by amino-acid family
@@ -130,6 +133,6 @@ Note: The code expects Ts not Us in the sequence.
         
         if verbosity > 0:
             if verbosity > 1:
-                print('--Relative frequencies--')
-            self.print_codon_freqs(counts)
+                outfile.write('--Relative frequencies--\n')
+            self.print_codon_freqs(counts, outfile)
         return counts

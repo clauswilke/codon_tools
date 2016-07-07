@@ -52,7 +52,7 @@ def deoptimize(seq, gene_description, Fop_start, Fop_step, Fop_stop, start_windo
     return records
     
         
-# when run as its own script, 
+# when run as its own script
 if __name__ == "__main__":
     # set up command line arguments
     parser = argparse.ArgumentParser(description='Codon-deoptimize gene sequence.')
