@@ -148,8 +148,8 @@ def generate_constructs(to_optimize, target, max_wait_count = 10000):
                   max_wait_count) for i in [14, 15, 16]]
     print("completed #14-#16 of", to_optimize.id)
 
-    fasta_fname = "recoded=%s_ref=%s.fasta" % (to_optimize.id, target.id)
-    descr_fname = "recoded=%s_ref=%s_descr.txt" % (to_optimize.id, target.id)
+    fasta_fname = "%s_recoded_to_%s.fasta" % (to_optimize.id, target.id)
+    descr_fname = "%s_recoded_to_%s_descr.txt" % (to_optimize.id, target.id)
 
     with open(descr_fname, 'w') as outfile:
         characterize_sequences([target] + records, outfile)
