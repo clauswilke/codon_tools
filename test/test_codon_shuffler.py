@@ -10,13 +10,18 @@ def test():
 
     shuffler = CodonShuffler()
 
-    shuffled_seq = shuffler.shuffle_codons(seq)
+    shuffled_seq = shuffler.shuffle_codons(seq, start_window = 10, end_window = 10)
 
     diffs = sum(1 for a, b in zip(seq, shuffled_seq) if a != b)
 
+    codon_diffs = 0
+    for i in range(0, int(len(seq)/3) - 1):
+        if seq[i*3:i*3+3] != shuffled_seq[i*3:i*3+3]:
+            codon_diffs += 1
+
     perc_id = 100 - (diffs/len(seq)*100)
 
-    print("Shuffled sequence shares {0:.1f}% sequence identity with original sequence. {1} nucleotide changes were introduced.".format(perc_id, diffs))
+    print("Shuffled sequence shares {0:.1f}% nucleotide sequence identity with original sequence. \nShuffling changed {1}/{2} nucleotides and {3}/{4} codons.".format(perc_id, diffs, len(seq), codon_diffs, int(len(seq)/3)))
 
 if __name__ == "__main__":
     test()
