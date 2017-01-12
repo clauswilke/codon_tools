@@ -17,9 +17,7 @@ class CodonShuffler:
         each amino acid. The same codon may be listed more than once for each
         amino acid.
         """
-
         codons = {}
-
         seq = Seq(seq, generic_dna)
 
         for i in range(int(len(seq)/3)):
@@ -36,15 +34,15 @@ class CodonShuffler:
         """
         Shuffle codons in a sequence without changing codon frequencies.
         """
-
+        # Construct dictionary of all codons present in the sequence
         codons = self.make_lookup_table(seq)
-
+        # Shuffle codons
         for amino_acid in codons:
             random.shuffle(codons[amino_acid])
-
+        # Translate original sequence
         seq_aa = Seq(seq, generic_dna).translate()
         shuffled_seq = ""
-
+        # Reconstruct sequence with codons shuffled
         for amino_acid in str(seq_aa):
             shuffled_seq += codons[amino_acid].pop()
 
