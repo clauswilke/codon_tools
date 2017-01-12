@@ -18,7 +18,6 @@ class CodonShuffler:
         amino acid.
         """
         codons = {}
-        seq = Seq(seq, generic_dna)
 
         for i in range(int(len(seq)/3)):
             codon = seq[3*i:3*i+3]
@@ -48,7 +47,7 @@ class CodonShuffler:
         for amino_acid in codons:
             random.shuffle(codons[amino_acid])
         # Translate original sequence
-        seq_aa = Seq(seq_trim, generic_dna).translate()
+        seq_aa = seq_trim.translate()
         shuffled_seq = seq[0:start]
         # Reconstruct sequence with codons shuffled
         for amino_acid in str(seq_aa):
