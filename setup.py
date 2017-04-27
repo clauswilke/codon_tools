@@ -7,7 +7,8 @@ setup(name='codon_tools',
       author='Claus O. Wilke',
       author_email='wilke@austin.utexas.edu',
       license='MIT',
-      package_dir = {'codon_tools':'src'},
+      test_suite='test',
+      package_dir = {'codon_tools':'codon_tools'},
       install_requires=['Biopython'],
       packages=['codon_tools']
       )
