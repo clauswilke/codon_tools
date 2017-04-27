@@ -4,7 +4,7 @@ Unit tests are auto-discovered based on the module name. So, unit tests for `cod
 
 All unit tests should extend `unittest.TestCase`. The `unittest` package provides helper functions for setting up code and cleaning up code after tests are run. They are not required but can be useful.
 
-Within a `unittest.TestCase` child class, the test runner will run any method with the prefix `test_`. Within each of these test methods, you can call many different assertion methods.
+Within a `unittest.TestCase` child class, the test runner will run any method with the prefix `test_`. Within each of these test methods, you can call many different assertion methods. See [the documentation](https://docs.python.org/3.6/library/unittest.html#basic-example) for details.
 
-Run: `setup.py test` to see test output.
+Run: `setup.py test` in the top-level directory to see test output.
 
